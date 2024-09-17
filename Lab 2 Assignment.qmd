@@ -72,9 +72,8 @@ rename(On_Time_Flights = On_Time, Delayed_Flights = Delayed)
 
 
 **Problem 2:** Take the data-frame that you tidied and cleaned in Problem 1 and create additional columns which contain the fraction of on-time and delayed flights at each airport. Then create a Cleveland Multiway Dot Plot (see [this tutorial page for a description for how](https://uc-r.github.io/cleveland-dot-plots)) to visualize the difference in flight delays between the two airlines at each city in the dataset. Compare the airlines and airports using the dot-plot- what are your conclusions?
-```{r}
-install.packages(devtools::install_github("hadley/ggplot2"))
-```
+
+
 
 ```{r}
 library(readxl)         # for reading in Excel data
@@ -98,7 +97,11 @@ ggplot(flights, mapping = aes(x = Fraction_Delayed, y = City, colour = Planes, l
          labs(title = "Comparing the Flight Delays with City vs Planes", x = "Fraction_Delayed", y = "City")  + geom_point()+geom_line(aes(group = City), size = 1)
 ```
 
-
+```{r}
+flights |> 
+ggplot(flights, mapping = aes(x = Fraction_On_Time, y = City, colour = Planes, label = round(Fraction_On_Time, 1))) +
+         labs(title = "Comparing the Flight On Time with City vs Planes", x = "Fraction_On_Time", y = "City")  + geom_point()+geom_line(aes(group = City), size = 1)
+```
 
 Optional: If you want to make a fancier visualization consider adding text labels containing the airline names above the dots using `geom_text` and `position = position_nudge(...)` with appropriate arguments.
 
@@ -123,7 +126,7 @@ Tidy this dataset using `pivot_longer` to create a new data frame where each the
 where the data-type of `Ingredient_Rank` is an integer. Hint: Use the `parse_number()` function in mutate after your initial pivot.
 
 ```{r}
-drinks <- read_csv("/Users/nanafrimpong/Desktop/SPS Fall 2024/Data & Acq 607/Data 607 R File/Lab Assignment 2/Lab 2 Data Tidying/MixedDrinkRecipes-Prep.csv")
+drinks <- read.csv("/Users/nanafrimpong/Desktop/SPS Fall 2024/Data & Acq 607/Data 607 R File/Lab Assignment 2/Lab 2 Data Tidying/MixedDrinkRecipes-Prep.csv")
 ```
 
 ```{r}
@@ -143,7 +146,7 @@ drinks = drinks |> mutate(
 
 ```{r}
 drinks = drinks |> 
-rename(Ingredient = values)
+rename(Ingredient = values) 
 ```
 
 
@@ -166,6 +169,8 @@ Juice of a lemon",
     Ingredient == "Fresh Lime Juice" ~ "Juice of a Lime",
   Ingredient == "Fresh Lime Juice" ~ "Juice of a Lime",
 Ingredient == "Powdered Sugar" ~ "Sugar",
+Ingredient == "Lemon Juice" ~ "Juice of a Lemon",
+Ingredient == "Fresh lemon juice" ~ "Lemon Juice",
     .default = "other"
     )
   )
@@ -186,23 +191,32 @@ drinks = drinks |>
 
 Note: You may be interested to read about the `widyr` package here: [widyr page](https://rdrr.io/cran/widyr/f/README.md). It is designed to solve problems like this one and uses internal pivot steps to accomplish it so that the final result is tidy. I'm actually unaware of any easy ways of solving problem 5 without pivoting to a wide dataset.
 
-```{r}
-install.packages("widyr")
-```
+
 
 ```{r}
 # install.packages("devtools")
 devtools::install_github("juliasilge/widyr")
 ```
 
+```{r}
+library(widyr)
+```
+
+
 
 ```{r}
 drinks = drinks |> 
 pivot_wider(
-  names_from = Ingredient,
-values_from = n,
-values_drop_na = TRUE
+  names_from = Ingredients_Pairs,
+values_from = n
 )
 ```
+
+```{r}
+drinks = drinks |>
+  count(Ingredient, `Juice of a Lime`, sort = TRUE)
+```
+
+
 
 
